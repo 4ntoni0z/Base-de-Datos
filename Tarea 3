@@ -1,0 +1,90 @@
+CREATE DATABASE tienda;
+USE tienda;
+
+-- 1. Tabla Categorias
+CREATE TABLE Categorias (
+    ID_Categoria INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre_Categoria VARCHAR(50),
+    Descripcion VARCHAR(200)
+);
+
+-- 2. Tabla Clientes
+CREATE TABLE Clientes (
+    ID_Cliente INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(100),
+    Correo VARCHAR(100),
+    Telefono VARCHAR(20)
+);
+
+-- 3. Tabla Productos
+CREATE TABLE Productos (
+    ID_Producto INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(100),
+    Precio DECIMAL(10, 2),
+    Stock INT,
+    ID_Categoria INT,
+    FOREIGN KEY (ID_Categoria) REFERENCES Categorias(ID_Categoria)
+);
+
+-- 4. Tabla Pedidos
+CREATE TABLE Pedidos (
+    ID_Pedido INT PRIMARY KEY AUTO_INCREMENT,
+    Fecha DATE,
+    Total DECIMAL(10, 2),
+    Estado VARCHAR(50),
+    ID_Cliente INT,
+    FOREIGN KEY (ID_Cliente) REFERENCES Clientes(ID_Cliente)
+);
+
+-- 5. Tabla Detalle_Pedidos
+CREATE TABLE Detalle_Pedidos (
+    ID_Detalle INT PRIMARY KEY AUTO_INCREMENT,
+    Cantidad INT,
+    Precio_Unitario DECIMAL(10, 2),
+    ID_pedido INT,
+    ID_Producto INT,
+    FOREIGN KEY (ID_pedido) REFERENCES Pedidos(ID_Pedido),
+    FOREIGN KEY (ID_Producto) REFERENCES Productos(ID_Producto)
+);
+
+
+-- 1. Insertar en Categorias
+INSERT INTO Categorias (Nombre_Categoria, Descripcion) 
+VALUES ('Electrónica', 'Dispositivos y gadgets tecnológicos'),
+       ('Ropa', 'Prenda de vestir para todas las edades');
+
+-- 2. Insertar en Clientes
+INSERT INTO Clientes (Nombre, Correo, Telefono) 
+VALUES ('Juan Pérez', 'juan.perez@gmail.com', '8112345678'),
+       ('Maria Garza', 'maria.garza@hotmail.com', '8187654321');
+
+-- 3. Insertar en Productos (usando ID_Categoria 1 y 2)
+INSERT INTO Productos (Nombre, Precio, Stock, ID_Categoria) 
+VALUES ('Laptop Dell', 12500.00, 10, 1),
+       ('Playera Algodón', 250.50, 50, 2);
+
+-- 4. Insertar en Pedidos (usando ID_Cliente 1 y 2)
+INSERT INTO Pedidos (Fecha, Total, Estado, ID_Cliente) 
+VALUES ('2026-09-10', 12500.00, 'Entregado', 1),
+       ('2026-09-14', 501.00, 'Pendiente', 2);
+
+-- 5. Insertar en Detalle_Pedidos (usando ID_pedido e ID_Producto)
+INSERT INTO Detalle_Pedidos (Cantidad, Precio_Unitario, ID_pedido, ID_Producto) 
+VALUES (1, 12500.00, 1, 1),
+       (2, 250.50, 2, 2);
+       
+       
+-- 1. Ver todos los registros de Categorias
+SELECT * FROM Categorias;
+
+-- 2. Ver todos los registros de Clientes
+SELECT * FROM Clientes;
+
+-- 3. Ver todos los registros de Productos
+SELECT * FROM Productos;
+
+-- 4. Ver todos los registros de Pedidos
+SELECT * FROM Pedidos;
+
+-- 5. Ver todos los registros de Detalle_Pedidos
+SELECT * FROM Detalle_Pedidos;
