@@ -1,0 +1,36 @@
+-- 1. INNER JOIN
+-- Muestra solo los monitoreos que tienen agente y supervisor asignados
+SELECT 
+    m.ID_monitoreo_calidad,
+    m.Calificacion_total,
+    a.Nombre_agente,
+    s.Nombre_Supervisor,
+    m.Fecha_monitoreo
+FROM monitoreo_calidad m
+INNER JOIN agente a ON m.ID_agente = a.ID_agente
+INNER JOIN supervisor s ON a.ID_Supervisor = s.ID_Supervisor;
+
+
+-- 2. LEFT JOIN
+-- Muestra TODOS los agentes, tengan o no monitoreos de calidad o supervisor
+SELECT 
+    a.ID_agente,
+    a.Nombre_agente,
+    s.Nombre_Supervisor,
+    m.ID_monitoreo_calidad,
+    m.Calificacion_total
+FROM agente a
+LEFT JOIN supervisor s ON a.ID_Supervisor = s.ID_Supervisor
+LEFT JOIN monitoreo_calidad m ON a.ID_agente = m.ID_agente;
+
+
+-- 3. RIGHT JOIN
+-- Muestra TODOS los supervisores, incluso los que no tienen agentes asignados
+SELECT 
+    s.ID_Supervisor,
+    s.Nombre_Supervisor,
+    a.Nombre_agente,
+    m.ID_monitoreo_calidad
+FROM monitoreo_calidad m
+LEFT JOIN agente a ON m.ID_agente = a.ID_agente
+RIGHT JOIN supervisor s ON a.ID_Supervisor = s.ID_Supervisor;
