@@ -1,0 +1,72 @@
+// Conexion con PYTHON
+
+import mysql.connector
+from mysql.connector import Error
+
+def conectar_y_consultar():
+    # Parámetros de conexión a MySQL
+    configuracion = {
+        'host': 'localhost',             
+        'user': 'root',                 
+        'password': '',      
+        'database': 'bd_mejora_continua' 
+    }
+
+    conexion = None
+    cursor = None
+
+    try:
+        print("--------------------------------------------------")
+        print("Iniciando proceso de conexión a la base de datos...")
+        
+        # 1. Establecer conexión con la base de datos
+        conexion = mysql.connector.connect(**configuracion)
+
+        if conexion.is_connected():
+            info_servidor = conexion.get_server_info()
+            print(f"[OK] Conexión establecida con éxito con MySQL Server v{info_servidor}")
+            
+            cursor = conexion.cursor(dictionary=True)
+            
+            # 2. Verificar la base de datos seleccionada
+            cursor.execute("SELECT DATABASE();")
+            bd_actual = cursor.fetchone()
+            print(f"[OK] Base de datos activa: {list(bd_actual.values())[0]}")
+            print("--------------------------------------------------")
+
+            # 3. Consulta de prueba: Obtener el promedio de calificación de calidad por agente
+            query = """
+            SELECT 
+                a.ID_agente,
+                a.Nombre_agente,
+                u.Nombre_Unidad,
+                COUNT(mc.ID_monitoreo_calidad) AS total_monitoreos,
+                ROUND(AVG(mc.Calificacion_total), 2) AS promedio_calificacion
+            FROM agente a
+            LEFT JOIN unidad u ON a.ID_Unidad = u.ID_Unidad
+            LEFT JOIN monitoreo_calidad mc ON a.ID_agente = mc.ID_agente
+            GROUP BY a.ID_agente, a.Nombre_agente, u.Nombre_Unidad;
+            """
+            
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+
+            print(" RESULTADOS DE LA CONSULTA (Monitoreo de Calidad):")
+            for fila in resultados:
+                promedio = fila['promedio_calificacion'] if fila['promedio_calificacion'] else "Sin evaluaciones"
+                print(f"- Agente ID {fila['ID_agente']}: {fila['Nombre_agente']} | Unidad: {fila['Nombre_Unidad']} | Monitoreos: {fila['total_monitoreos']} | Promedio: {promedio}")
+
+    except Error as e:
+        print(f"[ERROR] No se pudo conectar a la base de datos: {e}")
+
+    finally:
+        # 4. Cierre de cursores y conexión
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+            print("--------------------------------------------------")
+            print("[OK] Conexión cerrada de forma segura.")
+
+if __name__ == "__main__":
+    conectar_y_consultar()
